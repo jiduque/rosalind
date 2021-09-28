@@ -2,13 +2,15 @@ import re
 import argparse
 
 from os import path
+from math import log, comb, pow
 from typing import List, Tuple
 from collections import Counter
 from functools import reduce
 from itertools import combinations_with_replacement
 from difflib import SequenceMatcher
 
-from rosalind.helpers import DNA_COMPLEMENT_MAP, RNA_CODON_MAP, read_fasta_format
+from rosalind.helpers import SearchTree, read_fasta_format
+from rosalind.constants import DNA_COMPLEMENT_MAP, PROTEIN_MASS_MAP, RNA_CODON_MAP, PROTEIN_TO_NUM_RNA
 
 
 def count_nucleotides_in_dna(dna_string: str) -> dict:
@@ -23,7 +25,7 @@ def transcribe_dna_to_rna(dna_string: str) -> str:
     return "".join(map(lambda x: "U" if x == "T" else x, dna_string))
 
 
-def get_reverse_complement(dna_string: str) -> str:
+def reverse_complement(dna_string: str) -> str:
     return "".join(map(lambda x: DNA_COMPLEMENT_MAP[x], dna_string.strip()[::-1]))
 
 
@@ -83,11 +85,12 @@ def probability_offspring_has_dominant_allele(homo_dom: int, hetero: int, homo_r
 
 def translate_rna_to_protein(rna_string: str) -> str:
     n = len(rna_string)
-    output, i = "", 0
-
-    while i < n - 3 and RNA_CODON_MAP.get(rna_string[i:i+3]) != "Stop":
-        output += RNA_CODON_MAP.get(rna_string[i:i+3])
-        i += 3
+    output = ""
+    for i in range(0, n, 3):
+        protein = RNA_CODON_MAP.get(rna_string[i:i+3])
+        if protein in ["Stop", None]:
+            break
+        output += protein
 
     return output
 
@@ -97,7 +100,7 @@ def find_motif_in_dna(dna_string: str, motif: str) -> List[int]:
     return [m.start() for m in re.finditer(pattern, dna_string)]
 
 
-def get_profile(dict_of_seq: dict) -> dict:
+def profile(dict_of_seq: dict) -> dict:
     n = max(len(seq) for seq in dict_of_seq.values())
     output = {}
 
@@ -112,7 +115,7 @@ def get_profile(dict_of_seq: dict) -> dict:
     return output
 
 
-def get_consensus_from_profile(profile_dict: dict) -> str:
+def consensus_from_profile(profile_dict: dict) -> str:
     nucleotides = profile_dict.keys()
     n = len(profile_dict["A"])
 
@@ -127,22 +130,35 @@ def get_consensus_from_profile(profile_dict: dict) -> str:
     return output
 
 
-def get_consensus_and_profile(dict_of_seq: dict) -> Tuple[str, dict]:
-    profile = get_profile(dict_of_seq)
-    consensus = get_consensus_from_profile(profile)
-    return consensus, profile
+def consensus_and_profile(dict_of_seq: dict) -> Tuple[str, dict]:
+    prof = profile(dict_of_seq)
+    consensus = consensus_from_profile(prof)
+    return consensus, prof
 
 
 def number_of_mortal_rabbits(number_months: int, months_until_death: int) -> int:
-    return 3
+    assert months_until_death > 2
+    if 0 < number_months < 3:
+        return 1
+
+    dp = [0 for _ in range(number_months)]
+    dp[0], dp[1] = 1, 1
+    dp[months_until_death], dp[months_until_death + 1] = -1, -1
+
+    for i in range(2, number_months):
+        dp[i] += dp[i-1] + dp[i-2]
+        if i > months_until_death + 1:
+            dp[i] -= dp[i - months_until_death - 1]
+
+    return dp[number_months - 1]
 
 
 def overlap(dna1: str, dna2: str, order: int = 3) -> bool:
-    return (dna1 != dna2) and (dna1[-order:] == dna2[:order])
+    return (dna1 != dna2) and dna1.endswith(dna2[:order])
 
 
 # TODO: This solution is not working for some reason
-def get_overlap_graph(dict_of_seq: dict, order: int = 3) -> List[Tuple[str, str]]:
+def overlap_graph(dict_of_seq: dict, order: int = 3) -> List[Tuple[str, str]]:
     return list(filter(lambda x: overlap(dict_of_seq[x[0]], dict_of_seq[x[1]], order),
                        combinations_with_replacement(dict_of_seq.keys(), 2)
                        )
@@ -161,7 +177,6 @@ def expected_offspring(number_individuals: Tuple) -> float:
 def _shared_motif(dna1: str, dna2: str) -> str:
     matcher = SequenceMatcher(a=dna1, b=dna2)
     a_index, _, size = matcher.find_longest_match()
-    print(a_index, _, size)
 
     if size == 0:
         return ""
@@ -175,6 +190,77 @@ def find_shared_motif(list_of_seq: List[str]) -> str:
     return reduce(_shared_motif, list_of_seq)
 
 
+def probability_of_random_string(seq_to_analyze: str, list_of_probs: List[float]) -> List[float]:
+    counter = Counter(seq_to_analyze)
+    p_at = counter["A"] + counter["T"]
+    p_cg = counter["C"] + counter["G"]
+
+    return list(map(lambda x: p_at * log((1-x) / 2, 10) + p_cg * log(x/2, 10), list_of_probs))
+
+
+def failure_array(str_seq: str) -> List[int]:
+    n = len(str_seq)
+    output = [0 for _ in range(n)]
+
+    i, last_match_length = 1, 0
+
+    while i < n:
+        if str_seq[i] != str_seq[last_match_length] and last_match_length:
+            last_match_length = output[last_match_length - 1]
+            continue
+
+        if str_seq[i] == str_seq[last_match_length]:
+            last_match_length += 1
+            output[i] = last_match_length
+
+        i += 1
+
+    return output
+
+
+def protein_mass(protein_seq: str) -> float:
+    return sum(map(lambda x: PROTEIN_MASS_MAP[x], protein_seq))
+
+
+def probability_at_least_n_organisms(generations: int, n_individuals: int) -> float:
+    total_population = 2 ** generations
+    return 1 - sum(
+        map(lambda x: comb(total_population, x) * pow(0.25, x) * pow(0.75, total_population - x),
+            range(n_individuals)
+            )
+    )
+
+
+def number_rna_from_protein(protein_seq: str, mod: int = 1E6) -> int:
+    return int(3 * reduce(lambda x, y: x * y % mod,
+                          map(lambda x: PROTEIN_TO_NUM_RNA[x], protein_seq)
+                          ) % mod
+               )
+
+
+def candidate_proteins_from_dna(dna_str: str) -> List[str]:
+    pattern = r'(?=(AUG(?:...)*?)(?=UAG|UGA|UAA))'
+    rna_str = transcribe_dna_to_rna(dna_str)
+    forward = set(map(translate_rna_to_protein, re.findall(pattern, rna_str)))
+
+    rna_str = transcribe_dna_to_rna(reverse_complement(dna_str))
+    backward = set(map(translate_rna_to_protein, re.findall(pattern, rna_str)))
+
+    return list(forward.union(backward))
+
+
+def lexicographic_strings(ordered_alphabet: List[str], length: int) -> List[str]:
+    return list(map(lambda x: "".join(x),
+                    combinations_with_replacement(ordered_alphabet, length)))
+
+
+def protein_from_mass_spectrum(mass_data: List[float]) -> str:
+    inverted_key_values = list(map(lambda x: (x[1], x[0]), PROTEIN_MASS_MAP.items()))
+    search_tree = SearchTree(inverted_key_values)
+    mass_diff = list(map(lambda x, y: y - x, mass_data[:-1], mass_data[1:]))
+    return "".join(map(lambda x: search_tree.search_closest(x).val, mass_diff))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Count the nucleotides in a DNA sequence')
 
@@ -186,6 +272,10 @@ if __name__ == '__main__':
         print(f"File does not exists: {args.file[0]}")
 
     else:
-        data = list(read_fasta_format(args.file[0]).values())
-        answer = find_shared_motif(data)
-        print(answer)
+        # data = read_fasta_format(args.file[0])
+        # answer = failure_array(data['Rosalind_1471'])
+
+        with open(args.file[0], 'r') as file:
+            data = list(map(float, file.read().split()))
+            answer = protein_from_mass_spectrum(data)
+            print(f"{answer}")
