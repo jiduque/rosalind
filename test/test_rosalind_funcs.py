@@ -100,7 +100,7 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(expected_offspring(x), y, FLOAT_TOLERANCE)
 
     def test_find_shared_motif(self):
-        x = ["GATTACA", "TAGACCA", "ATACA"]
+        x = {"1": "GATTACA", "2": "TAGACCA", "3": "ATACA"}
         y = {"AC", "CA", "TA"}
         self.assertIn(find_shared_motif(x), y)
 
@@ -145,6 +145,20 @@ class MyTestCase(unittest.TestCase):
         x = [3524.8542, 3710.9335, 3841.974, 3970.0326, 4057.0646]
         y = "WMQS"
         self.assertEqual(protein_from_mass_spectrum(x), y)
+
+    def test_splice_dna(self):
+        x = {"Rosalind_10": "ATGGTCTACATAGCTGACAAACAGCACGTAGCAATCGGTCGAATCTCGAGAGGCATATGGTCACATGATCGGTCGAGCGTGTTTCAAAGTTTGCGCCTAG",
+             "Rosalind_12": "ATCGGTCGAA", "Rosalind_15": "ATCGGTCGAGCGTGT"}
+        y = "MVYIADKQHVASREAYGHMFKVCA"
+
+        self.assertEqual(splice_dna(x), y)
+
+    def test_transition_transversion_ratio(self):
+        x1 = "GCAACGCACAACGAAAACCCTTAGGGACTGGATTATTTCGTGATCGTTGTAGTTATTGGAAGTACGGGCATCAACCCAGTT"
+        x2 = "TTATCTGACAAAGAAAGCCGTCAACGGCTGGATAATTTCGCGATCGTGCTGGTTACTGGCGGTACGAGTGTTCCTTTGGGT"
+        y = 1.21428571429
+
+        self.assertAlmostEqual(transition_transversion_ratio(x1, x2), y, FLOAT_TOLERANCE)
 
 
 if __name__ == '__main__':

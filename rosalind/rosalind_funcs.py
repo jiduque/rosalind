@@ -7,10 +7,11 @@ from typing import List, Tuple
 from collections import Counter
 from functools import reduce
 from itertools import combinations_with_replacement
-from difflib import SequenceMatcher
 
-from rosalind.helpers import SearchTree, read_fasta_format
+from rosalind.helpers import BinarySearchTree, read_fasta_format
 from rosalind.constants import DNA_COMPLEMENT_MAP, PROTEIN_MASS_MAP, RNA_CODON_MAP, PROTEIN_TO_NUM_RNA
+
+from suffix_tree import Tree
 
 
 def count_nucleotides_in_dna(dna_string: str) -> dict:
@@ -72,13 +73,13 @@ def hamming_distance(dna_1: str, dna_2: str) -> int:
 
 def probability_offspring_has_dominant_allele(homo_dom: int, hetero: int, homo_rec: int) -> float:
     k, m, n = homo_dom, hetero, homo_rec
-    N = homo_dom + hetero + homo_rec
-    if N == 0:
+    t = homo_dom + hetero + homo_rec
+    if t == 0:
         return 0
 
     output = k * (k - 1) + 2 * k * m + 2 * k * n
     output += m * n + 0.75 * m * (m - 1)
-    output /= N * (N - 1)
+    output /= t * (t - 1)
 
     return output
 
@@ -93,6 +94,10 @@ def translate_rna_to_protein(rna_string: str) -> str:
         output += protein
 
     return output
+
+
+def translate_dna_to_protein(dna_string: str) -> str:
+    return translate_rna_to_protein(transcribe_dna_to_rna(dna_string))
 
 
 def find_motif_in_dna(dna_string: str, motif: str) -> List[int]:
@@ -157,12 +162,13 @@ def overlap(dna1: str, dna2: str, order: int = 3) -> bool:
     return (dna1 != dna2) and dna1.endswith(dna2[:order])
 
 
-# TODO: This solution is not working for some reason
 def overlap_graph(dict_of_seq: dict, order: int = 3) -> List[Tuple[str, str]]:
-    return list(filter(lambda x: overlap(dict_of_seq[x[0]], dict_of_seq[x[1]], order),
-                       combinations_with_replacement(dict_of_seq.keys(), 2)
-                       )
-                )
+    output = []
+    for n1 in dict_of_seq.keys():
+        for n2 in dict_of_seq.keys():
+            if overlap(dict_of_seq[n1], dict_of_seq[n2], order):
+                output.append((n1, n2))
+    return output
 
 
 def expected_offspring(number_individuals: Tuple) -> float:
@@ -173,21 +179,18 @@ def expected_offspring(number_individuals: Tuple) -> float:
                    )
 
 
-# TODO: Might need to return all strings
-def _shared_motif(dna1: str, dna2: str) -> str:
-    matcher = SequenceMatcher(a=dna1, b=dna2)
-    a_index, _, size = matcher.find_longest_match()
+def find_shared_motif(dict_of_seq: dict) -> str:
+    k = len(dict_of_seq)
+    generalized_suffix_tree = Tree(dict_of_seq)
+    lcss = max(filter(lambda x: x[0] == k,
+                      generalized_suffix_tree.common_substrings()),
+               key=lambda x: x[1])
+    if not lcss:
+        return ''
 
-    if size == 0:
-        return ""
+    s = lcss[2]
 
-    return dna1[a_index:a_index+size+1]
-
-
-# TODO: might need to turn this into a back tracking problem
-def find_shared_motif(list_of_seq: List[str]) -> str:
-    list_of_seq.sort(key=len)
-    return reduce(_shared_motif, list_of_seq)
+    return ''.join(map(str, s.S[s.start:s.end]))
 
 
 def probability_of_random_string(seq_to_analyze: str, list_of_probs: List[float]) -> List[float]:
@@ -256,9 +259,32 @@ def lexicographic_strings(ordered_alphabet: List[str], length: int) -> List[str]
 
 def protein_from_mass_spectrum(mass_data: List[float]) -> str:
     inverted_key_values = list(map(lambda x: (x[1], x[0]), PROTEIN_MASS_MAP.items()))
-    search_tree = SearchTree(inverted_key_values)
+    search_tree = BinarySearchTree(inverted_key_values)
     mass_diff = list(map(lambda x, y: y - x, mass_data[:-1], mass_data[1:]))
     return "".join(map(lambda x: search_tree.search_closest(x).val, mass_diff))
+
+
+def splice_dna(dict_of_seq: dict) -> str:
+    specimen, dna = max(dict_of_seq.items(), key=lambda x: len(x[1]))
+
+    for key, val in dict_of_seq.items():
+        if key != specimen:
+            dna = dna.replace(val, '')
+
+    return translate_dna_to_protein(dna)
+
+
+def transition_transversion_ratio(dna1: str, dna2: str) -> float:
+    transition_map = {"A": "G", "G": "A", "C": "T", "T": "C"}
+    transitions, transversions = 0, 0
+
+    for x, y in zip(dna1, dna2):
+        if transition_map[x] == y:
+            transitions += 1
+        elif x != y:
+            transversions += 1
+
+    return transitions / transversions if transversions else float("inf")
 
 
 if __name__ == '__main__':
@@ -272,10 +298,14 @@ if __name__ == '__main__':
         print(f"File does not exists: {args.file[0]}")
 
     else:
-        # data = read_fasta_format(args.file[0])
-        # answer = failure_array(data['Rosalind_1471'])
+        data = read_fasta_format(args.file[0])
+        answer = transition_transversion_ratio(*tuple(data.values()))
+        print(answer)
 
+        """
         with open(args.file[0], 'r') as file:
             data = list(map(float, file.read().split()))
             answer = protein_from_mass_spectrum(data)
             print(f"{answer}")
+
+        """

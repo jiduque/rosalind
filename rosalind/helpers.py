@@ -8,7 +8,7 @@ class Node(object):
         self.val = val
 
 
-class SearchTree(object):
+class BinarySearchTree(object):
     def __init__(self, list_of_values: List[Tuple]) -> None:
         list_of_values.sort(key=lambda x: x[0])
         self.data = list(map(lambda x: Node(*x), list_of_values))
@@ -70,4 +70,3 @@ def read_fasta_format(file_path: str) -> dict:
             output[data[0]] = "".join(data[1:])
 
     return output
-
