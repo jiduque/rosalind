@@ -19,3 +19,5 @@ with (DATA_LOCATION / 'rna_codon_table.pkl').open('rb') as handle:
 
 with (DATA_LOCATION / 'protein_mass.pkl').open('rb') as handle:
     PROTEIN_MASS_MAP = pickle.load(handle)
+
+UNIPROT_DB = "http://www.uniprot.org/uniprot"

@@ -1,16 +1,17 @@
+# TODO: Continue to refactor tests
 import unittest
 
-from rosalind.rosalind_funcs import *
+from rosalind.compare import *
+from rosalind.infer import *
+from rosalind.search import *
+from rosalind.simulate import *
+from rosalind.transform import *
+from rosalind.misc import *
 
 FLOAT_TOLERANCE = 3
 
 
 class MyTestCase(unittest.TestCase):
-    def test_count_nucleotides_in_dna(self):
-        x = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
-        y = {"A": 20, "C": 12, "G": 17, "T": 21}
-        self.assertEqual(count_nucleotides_in_dna(x), y)
-
     def test_transcribe_dna_to_rna(self):
         x = "GATGGAACTTGACTACGTAAATT"
         y = "GAUGGAACUUGACUACGUAAAUU"
@@ -23,22 +24,6 @@ class MyTestCase(unittest.TestCase):
     def test_number_of_rabbits_with_offspring(self):
         x, y = (5, 3), 19
         self.assertEqual(number_of_rabbits_with_offspring(*x), y)
-
-    def test_gc_content_in_dna(self):
-        x = "CCACCCTCGTGGTATGGCTAGGCATTCAGGAACCGGAGAACGCTTCAGACCAGCCCGGACTGGGAACCTGCGGGCAGTAGGTGGAAT"
-        y = 0.60919540
-        self.assertAlmostEqual(gc_content_of_dna(x), y, FLOAT_TOLERANCE)
-
-    def test_max_gc_content_in_list_of_dna(self):
-        x = {"Rosalind_6404": "CCTGCGGAAGATCGGCACTAGAATAGCCAGAACCGTTTCTCTGAGGCTTCCGGCCTTCCCTCCCACTAATAATTCTGAGG",
-             "Rosalind_5959": "CCATCGGTAGCGCATCCTTAGTCCAATTAAGTCCCTATCCAGGCGCTCCGCCGAAGGTCTATATCCATTTGTCAGCAGACACGC",
-             "Rosalind_0808": "CCACCCTCGTGGTATGGCTAGGCATTCAGGAACCGGAGAACGCTTCAGACCAGCCCGGACTGGGAACCTGCGGGCAGTAGGTGGAAT"}
-        y = ("Rosalind_0808", 0.60919540)
-
-        f_x = max_gc_content_in_list_of_dna(x)
-
-        self.assertEqual(f_x[0], y[0])
-        self.assertAlmostEqual(f_x[1], y[1], FLOAT_TOLERANCE)
 
     def test_hamming_distance(self):
         x1, x2 = "GAGCCTACTAACGGGAT", "CATCGTAATGACGGCCT"
@@ -57,23 +42,6 @@ class MyTestCase(unittest.TestCase):
     def test_find_motif_in_dna(self):
         x, y = ("GATATATGCATATACTT", "ATAT"), [1, 3, 9]
         self.assertEqual(find_motif_in_dna(*x), y)
-
-    def test_profile(self):
-        x = {"Rosalind_1": "ATCCAGCT", "Rosalind_2": "GGGCAACT",
-             "Rosalind_3": "ATGGATCT", "Rosalind_4": "AAGCAACC",
-             "Rosalind_5": "TTGGAACT", "Rosalind_6": "ATGCCATT",
-             "Rosalind_7": "ATGGCACT"}
-        y = {"A": [5, 1, 0, 0, 5, 5, 0, 0], "C": [0, 0, 1, 4, 2, 0, 6, 1],
-             "G": [1, 1, 6, 3, 0, 1, 0, 0], "T": [1, 5, 0, 0, 0, 1, 1, 6]}
-
-        self.assertEqual(profile(x), y)
-
-    def test_consensus_from_profile(self):
-        x = {"A": [5, 1, 0, 0, 5, 5, 0, 0], "C": [0, 0, 1, 4, 2, 0, 6, 1],
-             "G": [1, 1, 6, 3, 0, 1, 0, 0], "T": [1, 5, 0, 0, 0, 1, 1, 6]}
-        y = "ATGCAACT"
-
-        self.assertEqual(consensus_from_profile(x), y)
 
     def test_overlap(self):
         x1, x2, y = "AAATAAA", "AAATTTT", True
@@ -108,30 +76,9 @@ class MyTestCase(unittest.TestCase):
         x, y = (6, 3), 4
         self.assertEqual(number_of_mortal_rabbits(*x), y)
 
-    def test_probability_of_random_string(self):
-        x1 = "ACGATACAA"
-        x2 = [0.129, 0.287, 0.423, 0.476, 0.641, 0.742, 0.783]
-        y = [-5.737, -5.217, -5.263, -5.360, -5.958, -6.628, -7.009]
-
-        for f_x, y in zip(probability_of_random_string(x1, x2), y):
-            self.assertAlmostEqual(f_x, y, FLOAT_TOLERANCE)
-
-    def test_failure_array(self):
-        x = "CAGCATGGTATCACAGCAGAG"
-        y = [0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 2, 1, 2, 3, 4, 5, 3, 0, 0]
-        self.assertEqual(failure_array(x), y)
-
-    def test_protein_mass(self):
-        x, y = "SKADYEK", 821.392
-        self.assertAlmostEqual(protein_mass(x), y, FLOAT_TOLERANCE)
-
     def test_probability_at_least_n_organisms(self):
         x, y = (2, 1), 0.684
         self.assertAlmostEqual(probability_at_least_n_organisms(*x), y, FLOAT_TOLERANCE)
-
-    def test_number_rna_from_protein(self):
-        x, y = "MA", 12
-        self.assertEqual(number_rna_from_protein(x), y)
 
     def test_candidate_proteins_from_dna(self):
         x = "AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG"
@@ -153,12 +100,28 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(splice_dna(x), y)
 
-    def test_transition_transversion_ratio(self):
-        x1 = "GCAACGCACAACGAAAACCCTTAGGGACTGGATTATTTCGTGATCGTTGTAGTTATTGGAAGTACGGGCATCAACCCAGTT"
-        x2 = "TTATCTGACAAAGAAAGCCGTCAACGGCTGGATAATTTCGCGATCGTGCTGGTTACTGGCGGTACGAGTGTTCCTTTGGGT"
-        y = 1.21428571429
+    def test_edges_to_complete_the_tree(self):
+        x1 = 10
+        x2 = [(0, 1), (1, 7), (3, 9), (4, 8), (5, 9), (6, 8)]
+        y = 3
+        self.assertEqual(edges_to_complete_the_tree(x1, x2), y)
 
-        self.assertAlmostEqual(transition_transversion_ratio(x1, x2), y, FLOAT_TOLERANCE)
+    def test_n_glycosylation_motif(self):
+        x = "B5ZC00"
+        y = [85, 118, 142, 306, 395]
+        self.assertEqual(n_glycosylation_motif(x), y)
+
+    def test_list_n_glycosylation_motif(self):
+        x = ["A2Z669", "B5ZC00", "P07204_TRBM_HUMAN", "P20840_SAG1_YEAST"]
+        y = {"B5ZC00": [85, 118, 142, 306, 395],
+             "P07204_TRBM_HUMAN": [47, 115, 116, 382, 409],
+             "P20840_SAG1_YEAST": [79, 109, 135, 248, 306, 348, 364, 402, 485, 501, 614]
+             }
+        f_x = list_n_glycosylation_motif(x)
+
+        for key in y:
+            self.assertIn(key, f_x)
+            self.assertEqual(f_x[key], y[key])
 
 
 if __name__ == '__main__':
