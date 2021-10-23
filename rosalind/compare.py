@@ -3,6 +3,19 @@ from typing import Tuple, List
 from suffix_tree import Tree
 
 
+def transition_transversion_ratio(dna1: str, dna2: str) -> float:
+    transition_map = {"A": "G", "G": "A", "C": "T", "T": "C"}
+    transitions, transversions = 0, 0
+
+    for x, y in zip(dna1, dna2):
+        if transition_map[x] == y:
+            transitions += 1
+        elif x != y:
+            transversions += 1
+
+    return transitions / transversions if transversions else float("inf")
+
+
 def hamming_distance(dna_1: str, dna_2: str) -> int:
     assert len(dna_1) == len(dna_2)
     return sum(x != y for x, y in zip(dna_1, dna_2))

@@ -3,7 +3,7 @@ from math import log
 from collections import Counter
 from functools import reduce
 
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from rosalind.constants import PROTEIN_MASS_MAP, PROTEIN_TO_NUM_RNA
 
@@ -28,16 +28,7 @@ def gc_content_of_dna(dna_string: str) -> float:
     return output
 
 
-def max_gc_content_in_list_of_dna(dict_of_dna: dict) -> Tuple[str, float]:
-    gc_contents = {}
-
-    for specimen, dna in dict_of_dna.items():
-        gc_contents[specimen] = gc_content_of_dna(dna)
-
-    return max(gc_contents.items(), key=lambda x: x[1])
-
-
-def profile(dict_of_seq: dict) -> dict:
+def profile(dict_of_seq: dict) -> Dict:
     n = max(len(seq) for seq in dict_of_seq.values())
     output = {}
 
@@ -110,16 +101,3 @@ def number_rna_from_protein(protein_seq: str, mod: int = 1E6) -> int:
                           map(lambda x: PROTEIN_TO_NUM_RNA[x], protein_seq)
                           ) % mod
                )
-
-
-def transition_transversion_ratio(dna1: str, dna2: str) -> float:
-    transition_map = {"A": "G", "G": "A", "C": "T", "T": "C"}
-    transitions, transversions = 0, 0
-
-    for x, y in zip(dna1, dna2):
-        if transition_map[x] == y:
-            transitions += 1
-        elif x != y:
-            transversions += 1
-
-    return transitions / transversions if transversions else float("inf")

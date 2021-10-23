@@ -3,10 +3,20 @@ import re
 from typing import List, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
+from rosalind.analyze import gc_content_of_dna
 from rosalind.constants import UNIPROT_DB
 from rosalind.transform import reverse_complement
 
 import requests
+
+
+def max_gc_content_in_list_of_dna(dict_of_dna: dict) -> Tuple[str, float]:
+    gc_contents = {}
+
+    for specimen, dna in dict_of_dna.items():
+        gc_contents[specimen] = gc_content_of_dna(dna)
+
+    return max(gc_contents.items(), key=lambda x: x[1])
 
 
 def find_motif_in_dna(dna_string: str, motif: str) -> List[int]:
