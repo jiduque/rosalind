@@ -1,9 +1,9 @@
-from _cli.analyze_router import Analyze
-from _cli.compare_router import Compare
-from _cli.infer_router import Infer
-from _cli.search_router import Search
-from _cli.simulate_router import Simulate
-from _cli.transform_router import Transform
+from rosalind._cli.analyze_router import Analyze
+from rosalind._cli.compare_router import Compare
+from rosalind._cli.infer_router import Infer
+from rosalind._cli.search_router import Search
+from rosalind._cli.simulate_router import Simulate
+from rosalind._cli.transform_router import Transform
 
 
 import fire
