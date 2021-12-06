@@ -101,3 +101,17 @@ def number_rna_from_protein(protein_seq: str, mod: int = 1E6) -> int:
                           map(lambda x: PROTEIN_TO_NUM_RNA[x], protein_seq)
                           ) % mod
                )
+
+
+def four_mer_composition(dna_seq: str) -> List[int]:
+    n = len(dna_seq)
+
+    output = [0 for _ in range(4**4)]  # 256 = 4^4
+    int_map = {'A': '0', 'C': '1', 'G': '2', 'T': '3'}
+
+    for i in range(n - 3):
+        ind_4 = ''.join(map(lambda x: int_map[x], dna_seq[i:i+4]))
+        index = int(ind_4, 4)
+        output[index] += 1
+
+    return output

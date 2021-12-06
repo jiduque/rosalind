@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 from suffix_tree import Tree
 
@@ -25,7 +25,7 @@ def overlap(dna1: str, dna2: str, order: int = 3) -> bool:
     return (dna1 != dna2) and dna1.endswith(dna2[:order])
 
 
-def overlap_graph(dict_of_seq: dict, order: int = 3) -> List[Tuple[str, str]]:
+def overlap_graph(dict_of_seq: Dict[str, str], order: int = 3) -> List[Tuple[str, str]]:
     output = []
     for n1 in dict_of_seq.keys():
         for n2 in dict_of_seq.keys():
@@ -34,7 +34,7 @@ def overlap_graph(dict_of_seq: dict, order: int = 3) -> List[Tuple[str, str]]:
     return output
 
 
-def find_shared_motif(dict_of_seq: dict) -> str:
+def find_shared_motif(dict_of_seq: Dict[str, str]) -> str:
     k = len(dict_of_seq)
     generalized_suffix_tree = Tree(dict_of_seq)
     lcss = max(filter(lambda x: x[0] == k,
@@ -46,3 +46,23 @@ def find_shared_motif(dict_of_seq: dict) -> str:
     s = lcss[2]
 
     return ''.join(map(str, s.S[s.start:s.end]))
+
+
+def distance_matrix(dict_of_seq: Dict[str, str], order: List[str]):
+    n = len(order)
+    output = [[0.0 for _ in range(n)] for _ in range(n)]
+
+    for i, specimen1 in enumerate(order):
+        dna1 = dict_of_seq[specimen1]
+        m = len(dna1)
+
+        for j, specimen2 in enumerate(order[i:]):
+            if i == j:
+                continue
+
+            dna2 = dict_of_seq[specimen2]
+            dist = hamming_distance(dna1, dna2) / m
+            output[i][j] = dist
+            output[j][i] = dist
+
+    return output

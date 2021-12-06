@@ -28,21 +28,6 @@ class TestGCContentInDNA(unittest.TestCase):
         y = 0.0
         self.assertEqual(gc_content_of_dna(x), y)
 
-    def test_valid_input_max_list(self):
-        x = {"Rosalind_6404": "CCTGCGGAAGATCGGCACTAGAATAGCCAGAACCGTTTCTCTGAGGCTTCCGGCCTTCCCTCCCACTAATAATTCTGAGG",
-             "Rosalind_5959": "CCATCGGTAGCGCATCCTTAGTCCAATTAAGTCCCTATCCAGGCGCTCCGCCGAAGGTCTATATCCATTTGTCAGCAGACACGC",
-             "Rosalind_0808": "CCACCCTCGTGGTATGGCTAGGCATTCAGGAACCGGAGAACGCTTCAGACCAGCCCGGACTGGGAACCTGCGGGCAGTAGGTGGAAT"}
-        y = ("Rosalind_0808", 0.60919540)
-
-        f_x = max_gc_content_in_list_of_dna(x)
-
-        self.assertEqual(f_x[0], y[0])
-        self.assertAlmostEqual(f_x[1], y[1], FLOAT_TOLERANCE)
-
-    def test_empty_max_list(self):
-        x = {}
-        self.assertRaises(ValueError, max_gc_content_in_list_of_dna, x)
-
 
 class TestConsensusAndProfile(unittest.TestCase):
     def test_profile_valid(self):
@@ -113,7 +98,36 @@ class TestNumberRNAFromProtein(unittest.TestCase):
 
     def test_empty(self):
         self.assertRaises(TypeError, number_rna_from_protein, '')
-    
+
+
+class TestFourMerComposition(unittest.TestCase):
+    def test_valid(self):
+        x = """
+        CTTCGAAAGTTTGGGCCGAGTCTTACAGTCGGTCTTGAAGCAAAGTAACGAACTCCACGG
+        CCCTGACTACCGAACCAGTTGTGAGTACTCAACTGGGTGAGAGTGCAGTCCCTATTGAGT
+        TTCCGAGACTCACCGGGATTTTCGATCCAGCCTCAGTCCAGTCTTGTGGCCAACTCACCA
+        AATGACGTTGGAATATCCCTGTCTAGCTCACGCAGTACTTAGTAAGAGGTCGCTGCAGCG
+        GGGCAAGGAGATCGGAAAATGTGCTCTATATGCGACTAAAGCTCCTAACTTACACGTAGA
+        CTTGCCCGTGTTAAAAACTCGGCTCACATGCTGTCTGCGGCTGGCTGTATACAGTATCTA
+        CCTAATACCCTTCAGTTCGCCGCACAAAAGCTGGGAGTTACCGCGGAAATCACAG
+        """.strip().replace(' ', '').replace('\n', '')
+
+        y = [
+            4, 1, 4, 3, 0, 1, 1, 5, 1, 3, 1, 2, 2, 1, 2, 0, 1, 1, 3, 1, 2, 1, 3, 1, 1, 1, 1, 2, 2, 5, 1, 3,
+            0, 2, 2, 1, 1, 1, 1, 3, 1, 0, 0, 1, 5, 5, 1, 5, 0, 2, 0, 2, 1, 2, 1, 1, 1, 2, 0, 1, 0, 0, 1, 1,
+            3, 2, 1, 0, 3, 2, 3, 0, 0, 2, 0, 8, 0, 0, 1, 0, 2, 1, 3, 0, 0, 0, 1, 4, 3, 2, 1, 1, 3, 1, 2, 1,
+            3, 1, 2, 1, 2, 1, 1, 1, 2, 3, 2, 1, 1, 0, 1, 1, 3, 2, 1, 2, 6, 2, 1, 1, 1, 2, 3, 3, 3, 2, 3, 0,
+            3, 2, 1, 1, 0, 0, 1, 4, 3, 0, 1, 5, 0, 2, 0, 1, 2, 1, 3, 0, 1, 2, 2, 1, 1, 0, 3, 0, 0, 4, 5, 0,
+            3, 0, 2, 1, 1, 3, 0, 3, 2, 2, 1, 1, 0, 2, 1, 0, 2, 2, 1, 2, 0, 2, 2, 5, 2, 2, 1, 1, 2, 1, 2, 2,
+            2, 2, 1, 1, 3, 4, 0, 2, 1, 1, 0, 1, 2, 2, 1, 1, 1, 5, 2, 0, 3, 2, 1, 1, 2, 2, 3, 0, 3, 0, 1, 3,
+            1, 2, 3, 0, 2, 1, 2, 2, 1, 2, 3, 0, 1, 2, 3, 1, 1, 3, 1, 0, 1, 1, 3, 0, 2, 1, 2, 2, 0, 2, 1, 1,
+        ]
+
+        self.assertEqual(four_mer_composition(x), y)
+
+    def test_empty(self):
+        self.assertRaises(TypeError, number_rna_from_protein, '')
+
 
 if __name__ == '__main__':
     unittest.main()

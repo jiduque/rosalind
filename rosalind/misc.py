@@ -1,13 +1,13 @@
 
 from typing import List, Tuple
-from itertools import combinations_with_replacement
+from itertools import product
 
 from rosalind._data_structures import UnionFind
 
 
 def lexicographic_strings(ordered_alphabet: List[str], length: int) -> List[str]:
     return list(map(lambda x: "".join(x),
-                    combinations_with_replacement(ordered_alphabet, length)))
+                    product(ordered_alphabet, repeat=length)))
 
 
 def edges_to_complete_the_tree(number_of_nodes: int, list_of_edges: List[Tuple[int, int]]) -> int:

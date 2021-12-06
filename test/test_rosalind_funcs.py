@@ -25,11 +25,6 @@ class MyTestCase(unittest.TestCase):
         x, y = (5, 3), 19
         self.assertEqual(number_of_rabbits_with_offspring(*x), y)
 
-    def test_hamming_distance(self):
-        x1, x2 = "GAGCCTACTAACGGGAT", "CATCGTAATGACGGCCT"
-        y = 7
-        self.assertEqual(hamming_distance(x1, x2), y)
-
     def test_probability_offspring_has_dominant_allele(self):
         x, y = (2, 2, 2), 0.7833
         self.assertAlmostEqual(probability_offspring_has_dominant_allele(*x), y, FLOAT_TOLERANCE)

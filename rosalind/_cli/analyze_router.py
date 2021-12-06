@@ -18,7 +18,7 @@ class Analyze:
         return analyze.count_nucleotides_in_dna(dna_string)
 
     @staticmethod
-    def gc_content(sequence_file: Path) -> float:
+    def gc(sequence_file: Path) -> float:
         """Calculates the GC percentage of a DNA string"""
         dna_string = read_sequence(str(sequence_file))
         return analyze.gc_content_of_dna(dna_string)
@@ -53,3 +53,9 @@ class Analyze:
         """Calculates the number of RNA sequences that map to this protein string (modulo an optional number)"""
         protein_seq = read_sequence(str(sequence_file))
         return analyze.number_rna_from_protein(protein_seq, mod)
+
+    @staticmethod
+    def composition_4mer(fasta_file: Path) -> Dict[str, List[int]]:
+        """Computes the 4-mer composition of DNA strings in FASTA File"""
+        fasta_dict = fasta_to_dict(str(fasta_file))
+        return {k: analyze.four_mer_composition(v) for k, v in fasta_dict.items()}

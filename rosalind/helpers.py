@@ -1,14 +1,14 @@
-from typing import List, Dict
+from typing import Dict, List, Tuple
 
 
 def read_sequence(file_path: str) -> str:
     with open(file_path, 'r') as file:
-        return file.readline()
+        return file.readline().strip()
 
 
 def read_several_sequences(file_path: str) -> List[str]:
     with open(file_path, 'r') as file:
-        return file.read().strip().split()
+        return file.read().strip().split("\n")
 
 
 def fasta_to_dict(file_path: str) -> Dict:
@@ -21,7 +21,7 @@ def fasta_to_dict(file_path: str) -> Dict:
     return output
 
 
-def fasta_to_list(file_path: str) -> List:
+def fasta_to_list(file_path: str) -> List[Tuple[str, str]]:
     output = []
     with open(file_path, 'r') as file:
         for pair in file.read().strip().split(">")[1:]:

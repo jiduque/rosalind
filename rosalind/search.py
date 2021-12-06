@@ -10,7 +10,7 @@ from rosalind.transform import reverse_complement
 import requests
 
 
-def max_gc_content_in_list_of_dna(dict_of_dna: dict) -> Tuple[str, float]:
+def find_max_gc(dict_of_dna: dict) -> Tuple[str, float]:
     gc_contents = {}
 
     for specimen, dna in dict_of_dna.items():
@@ -47,6 +47,7 @@ def list_n_glycosylation_motif(list_of_proteins: List[str]) -> dict:
     return output
 
 
+# TODO: still need to work out the logic for this one
 def find_restriction_sites(dna_str: str) -> List[Tuple[int, int]]:
     """
     http://rosalind.info/problems/revp/
