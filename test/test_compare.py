@@ -33,5 +33,23 @@ class TestHammingDistance(unittest.TestCase):
         self.assertEqual(hamming_distance(x1, x2), y)
 
 
+class TestSpectralConvolution(unittest.TestCase):
+    def test_valid(self):
+        s1 = [186.07931, 287.12699, 548.20532, 580.18077, 681.22845, 706.27446, 782.27613, 968.35544, 968.35544]
+        s2 = [101.04768, 158.06914, 202.09536, 318.09979, 419.14747, 463.17369]
+        y = (3, 85.03163)
+
+        output = spectral_convolution(s1, s2)
+
+        self.assertEqual(output[0], y[0])
+        self.assertAlmostEqual(output[1], y[1], FLOAT_TOLERANCE)
+
+    def test_empty(self):
+        s1 = []
+        s2 = [1, 3, 19.2]
+
+        self.assertRaises(ValueError, spectral_convolution, s1, s2)
+
+
 if __name__ == '__main__':
     unittest.main()

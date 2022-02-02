@@ -34,3 +34,10 @@ class Compare:
         """Computes the largest shared motif of several specimens in a FASTA file"""
         fasta_dict = fasta_to_dict(str(fasta_file))
         return compare.find_shared_motif(fasta_dict)
+
+    @staticmethod
+    def spc_conv(sequence_file: Path) -> Tuple[int, float]:
+        """Computes the largest multiplicity of the spectral convolution of two spectra in a file"""
+        spc_lines = read_several_sequences(str(sequence_file))[:2]
+        spectra = tuple(map(lambda line: list(map(float, line.split())), spc_lines))
+        return compare.spectral_convolution(*spectra)

@@ -1,4 +1,6 @@
 from typing import Tuple, List, Dict
+from itertools import product
+from collections import Counter
 
 from suffix_tree import Tree
 
@@ -66,3 +68,9 @@ def distance_matrix(dict_of_seq: Dict[str, str], order: List[str]):
             output[j][i] = dist
 
     return output
+
+
+def spectral_convolution(spectra1: List[float], spectra2: List[float]) -> Tuple[int, float]:
+    minkowski_diff_counter = Counter(map(lambda x: round(x[0] - x[1], 6), product(spectra1, spectra2)))
+    solution = max(minkowski_diff_counter, key=lambda x: minkowski_diff_counter[x])
+    return minkowski_diff_counter[solution], abs(solution)
