@@ -61,8 +61,6 @@ def find_restriction_sites(dna_str: str) -> List[Tuple[int, int]]:
     n = len(dna_str)
     length_tracker = [0 for _ in range(n)]
 
-
-    #
     for i in range(n):
         if dna_str[i] == reverse_comp[i]:
             length_tracker[i] = 1 + int(i > 0) * length_tracker[i - 1]

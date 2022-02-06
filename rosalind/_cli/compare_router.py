@@ -36,6 +36,15 @@ class Compare:
         return compare.find_shared_motif(fasta_dict)
 
     @staticmethod
+    def distance_matrix(fasta_file: Path) -> List[List[float]]:
+        """Computest the distance matrix of several sequences in a FASTA file"""
+        dna_list = list(map(
+            lambda x: x[1],
+            fasta_to_list(str(fasta_file))
+        ))
+        return compare.distance_matrix(dna_list)
+
+    @staticmethod
     def spc_conv(sequence_file: Path) -> Tuple[int, float]:
         """Computes the largest multiplicity of the spectral convolution of two spectra in a file"""
         spc_lines = read_several_sequences(str(sequence_file))[:2]

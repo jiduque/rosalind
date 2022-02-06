@@ -50,19 +50,20 @@ def find_shared_motif(dict_of_seq: Dict[str, str]) -> str:
     return ''.join(map(str, s.S[s.start:s.end]))
 
 
-def distance_matrix(dict_of_seq: Dict[str, str], order: List[str]):
-    n = len(order)
+def distance_matrix(list_of_seq: List[str]) -> List[List[float]]:
+    n = len(list_of_seq)
+
     output = [[0.0 for _ in range(n)] for _ in range(n)]
 
-    for i, specimen1 in enumerate(order):
-        dna1 = dict_of_seq[specimen1]
+    for i in range(n):
+        dna1 = list_of_seq[i]
         m = len(dna1)
 
-        for j, specimen2 in enumerate(order[i:]):
+        for j in range(i, n):
             if i == j:
                 continue
 
-            dna2 = dict_of_seq[specimen2]
+            dna2 = list_of_seq[j]
             dist = hamming_distance(dna1, dna2) / m
             output[i][j] = dist
             output[j][i] = dist
