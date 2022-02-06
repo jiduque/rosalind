@@ -3,7 +3,7 @@ from typing import Dict, List
 
 import rosalind.analyze as analyze
 
-from rosalind.helpers import fasta_to_dict, read_sequence
+from rosalind.helpers import fasta_to_dict, fasta_to_list, read_sequence
 
 
 class Analyze:
@@ -59,3 +59,9 @@ class Analyze:
         """Computes the 4-mer composition of DNA strings in FASTA File"""
         fasta_dict = fasta_to_dict(str(fasta_file))
         return {k: analyze.four_mer_composition(v) for k, v in fasta_dict.items()}
+
+    @staticmethod
+    def matchings(fasta_file: Path) -> int:
+        """Computes the maximum matching in the dna sequence"""
+        dna_seq = fasta_to_list(str(fasta_file))[0][1]
+        return analyze.dna_matchings(dna_seq)

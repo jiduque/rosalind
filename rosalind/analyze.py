@@ -1,5 +1,5 @@
 
-from math import log
+from math import log, factorial
 from collections import Counter
 from functools import reduce
 
@@ -114,4 +114,14 @@ def four_mer_composition(dna_seq: str) -> List[int]:
         index = int(ind_4, 4)
         output[index] += 1
 
+    return output
+
+
+def dna_matchings(dna_seq: str) -> int:
+    counter = Counter(dna_seq)
+    output = 1
+    for c1, c2 in [('A', 'U'), ('C', 'G')]:
+        numerator = factorial(max(counter[c1], counter[c2]))
+        denominator = factorial(abs(counter[c1] - counter[c2]))
+        output *= numerator // denominator
     return output

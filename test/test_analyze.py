@@ -129,5 +129,22 @@ class TestFourMerComposition(unittest.TestCase):
         self.assertRaises(TypeError, number_rna_from_protein, '')
 
 
+class TestMatching(unittest.TestCase):
+    def test_valid(self):
+        x = "AGCUAGUCAU"
+        y = 12
+        self.assertEqual(dna_matchings(x), y)
+
+    def test_long_string(self):
+        x = "GAUCGGUGCGACACAUAUACUCACGGUCGUAGAACGCCUUAGCCGGGCAUUUCCUUAAACUGCCUAGCAAUGAGGGUU"
+        y = 295950609069496384270872084480000000
+        self.assertEqual(dna_matchings(x), y)
+
+    def test_imperfect_matches(self):
+        x = "AUGCUUC"
+        y = 6
+        self.assertEqual(dna_matchings(x), y)
+
+
 if __name__ == '__main__':
     unittest.main()
