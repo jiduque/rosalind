@@ -10,5 +10,13 @@ class TestProteinFromMassSpectrum(unittest.TestCase):
         self.assertEqual(protein_from_mass_spectrum(x), y)
 
 
+class TestSpectrumToProtein(unittest.TestCase):
+    def test_valid(self):
+        x1 = [445.17838, 115.02694, 186.07931, 314.13789, 317.1198, 215.09061]
+        x2 = ["GSDMQS", "VWICN", "IASWMQS", "PVSMGAD"]
+        y = [(3, "IASWMQS"), (3, 'GSDMQS')]
+        self.assertIn(spectrum_to_protein(x1, x2), y)
+
+
 if __name__ == '__main__':
     unittest.main()
